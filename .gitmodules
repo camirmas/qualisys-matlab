@@ -1,0 +1,3 @@
+[submodule "qualisys_cpp_sdk"]
+	path = qualisys_cpp_sdk
+	url = git@github.com:camirmas/qualisys_cpp_sdk.git
