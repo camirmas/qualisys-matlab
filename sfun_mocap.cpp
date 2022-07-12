@@ -84,7 +84,7 @@ static void mdlInitializeSizes(SimStruct *S)
     if (!ssSetNumInputPorts(S, 0)) return;
     
     if (!ssSetNumOutputPorts(S, 1)) return;
-    ssSetOutputPortWidth(S, 0, 3); // will be 6 later
+    ssSetOutputPortWidth(S, 0, 6); // 6 DOFs
     
     ssSetNumSampleTimes(S, 1);
     ssSetNumRWork(S, 0);
@@ -224,16 +224,16 @@ static void mdlOutputs(SimStruct *S, int_T tid)
         if (packetType == CRTPacket::PacketData)
         {
             float fX, fY, fZ;
-            float rotationMatrix[9];
+            float fAng1, fAng2, fAng3;
             
             CRTPacket* rtPacket = rtProtocol->GetRTPacket();
             
             ssPrintf("Frame %d\n", rtPacket->GetFrameNumber());
             ssPrintf("======================================================================================================================\n");
             
-            for (unsigned int i = 0; i < rtPacket->Get6DOFBodyCount(); i++)
+            for (unsigned int i = 0; i < rtPacket->Get6DOFEulerBodyCount(); i++)
             {
-                if (rtPacket->Get6DOFBody(i, fX, fY, fZ, rotationMatrix))
+                if (rtPacket->Get6DOFEulerBody(i, fX, fY, fZ, fAng1, fAng2, fAng3))
                 {
                     const char* pTmpStr = rtProtocol->Get6DOFBodyName(i);
                     if (pTmpStr)
@@ -244,14 +244,13 @@ static void mdlOutputs(SimStruct *S, int_T tid)
                     {
                         ssPrintf("Unknown     ");
                     }
-                    ssPrintf("Pos: %9.3f %9.3f %9.3f    Rot: %6.3f %6.3f %6.3f %6.3f %6.3f %6.3f %6.3f %6.3f %6.3f\n",
-                            fX, fY, fZ, rotationMatrix[0], rotationMatrix[1], rotationMatrix[2],
-                            rotationMatrix[3], rotationMatrix[4], rotationMatrix[5], rotationMatrix[6], rotationMatrix[7], rotationMatrix[8]);
+                    ssPrintf("Pos: %9.3f %9.3f %9.3f    Roll: %3.3f    Pitch: %3.3f    Yaw: %3.3f\n",
+                            fX, fY, fZ, fAng1, fAng2, fAng3);
                 }
             }
             ssPrintf("\n");
             
-            float position[3]{fX, fY, fZ};
+            const float position[6]{fX, fY, fZ, fAng1, fAng2, fAng3};
             
             // Set outputs (NOTE: if >1 body, will only reflect coordinates of the last one)
             

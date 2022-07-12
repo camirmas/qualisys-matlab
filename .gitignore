@@ -1,1 +1,6 @@
 *.cpp~
+*.m~
+*.png
+slprj/
+*.mex*
+.autosave
